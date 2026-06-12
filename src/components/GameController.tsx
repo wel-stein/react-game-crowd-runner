@@ -26,7 +26,7 @@ export function GameController() {
   const { camera } = useThree()
   useControls()
 
-  const battleData = useRef({ startCrowd: 0, started: false })
+  const battleData = useRef({ startCrowd: 0, started: false, casualtyTimer: 0 })
 
   useFrame((_, rawDt) => {
     const dt = Math.min(rawDt, 0.05)
@@ -67,7 +67,7 @@ export function GameController() {
       const bossRenderZ = BOSS_WORLD_Z + game.traveled
       if (bossRenderZ >= BOSS_STOP_Z) {
         game.traveled = BOSS_STOP_Z - BOSS_WORLD_Z // freeze the world
-        battleData.current = { startCrowd: store.crowd, started: true }
+        battleData.current = { startCrowd: store.crowd, started: true, casualtyTimer: 0 }
         game.battleTime = 0
         store.beginBattle()
       }
@@ -81,9 +81,19 @@ export function GameController() {
 
       const start = battleData.current.startCrowd
       const max = store.bossMax
-      // boss health and crowd both tick down for drama
+      // boss health and crowd both tick down for drama — the runners take heavy
+      // casualties as they smash into the boss
       store.setBossHealth(Math.max(0, Math.round(max - start * e)))
       store.setCrowd(Math.max(0, Math.round(start - max * e)))
+
+      // spray "poof" bursts at the front line as runners fall, so the shrinking
+      // crowd reads as losses in the fight
+      battleData.current.casualtyTimer -= dt
+      if (battleData.current.casualtyTimer <= 0) {
+        battleData.current.casualtyTimer = 0.08
+        const px = (Math.random() - 0.5) * 4
+        emitBurst(px, 0.7, BOSS_STOP_Z + 1.2 + Math.random(), '#e8eef5')
+      }
 
       if (t >= 1 && battleData.current.started) {
         battleData.current.started = false
