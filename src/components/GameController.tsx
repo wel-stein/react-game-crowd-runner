@@ -1,0 +1,111 @@
+import { useFrame, useThree } from '@react-three/fiber'
+import { useRef } from 'react'
+import {
+  applyOp,
+  BATTLE_DURATION,
+  BOSS_STOP_Z,
+  BOSS_WORLD_Z,
+  BOSS_TRAVEL,
+  GATE_HIT_Z,
+  KEY_STEER_SPEED,
+  MAX_X,
+  opColor,
+  RUN_SPEED,
+  STEER_LERP,
+} from '../config'
+import { useControls } from '../hooks/useControls'
+import { game } from '../state/game'
+import { useGameStore } from '../state/store'
+import { emitBurst } from '../utils/effects'
+import { clamp, easeOutCubic, lerp } from '../utils/math'
+
+// Owns the whole game loop: steering, world scroll, gate resolution, boss
+// trigger and the final battle. Reads input from the live `game` runtime and
+// pushes player-facing state into the zustand store.
+export function GameController() {
+  const { camera } = useThree()
+  useControls()
+
+  const battleData = useRef({ startCrowd: 0, started: false })
+
+  useFrame((_, rawDt) => {
+    const dt = Math.min(rawDt, 0.05)
+    const store = useGameStore.getState()
+    const phase = store.phase
+
+    if (phase === 'playing') {
+      game.time += dt
+
+      // --- steering ---------------------------------------------------------
+      if (game.keyLeft) game.targetX -= KEY_STEER_SPEED * dt
+      if (game.keyRight) game.targetX += KEY_STEER_SPEED * dt
+      game.targetX = clamp(game.targetX, -MAX_X, MAX_X)
+      game.leaderX = lerp(game.leaderX, game.targetX, Math.min(1, dt * STEER_LERP))
+
+      // --- world scroll -----------------------------------------------------
+      game.traveled += RUN_SPEED * dt
+      store.setProgress(clamp(game.traveled / BOSS_TRAVEL, 0, 1))
+
+      // --- gate resolution --------------------------------------------------
+      for (const section of game.sections) {
+        if (section.resolved) continue
+        const renderZ = section.worldZ + game.traveled
+        if (renderZ >= GATE_HIT_Z) {
+          const chosen = game.leaderX < 0 ? 'left' : 'right'
+          section.chosen = chosen
+          section.resolved = true
+          const op = chosen === 'left' ? section.left : section.right
+          const next = applyOp(store.crowd, op)
+          store.setCrowd(next)
+          game.shake = Math.min(game.shake + 0.25, 0.6)
+          const gx = chosen === 'left' ? -2.4 : 2.4
+          emitBurst(gx, 1.1, GATE_HIT_Z, opColor(op.kind))
+        }
+      }
+
+      // --- boss trigger -----------------------------------------------------
+      const bossRenderZ = BOSS_WORLD_Z + game.traveled
+      if (bossRenderZ >= BOSS_STOP_Z) {
+        game.traveled = BOSS_STOP_Z - BOSS_WORLD_Z // freeze the world
+        battleData.current = { startCrowd: store.crowd, started: true }
+        game.battleTime = 0
+        store.beginBattle()
+      }
+    } else if (phase === 'battle') {
+      game.time += dt
+      game.battleTime += dt
+      const t = clamp(game.battleTime / BATTLE_DURATION, 0, 1)
+      const e = easeOutCubic(t)
+      game.battleRush = e
+      game.shake = 0.35 * (1 - t) + 0.12
+
+      const start = battleData.current.startCrowd
+      const max = store.bossMax
+      // boss health and crowd both tick down for drama
+      store.setBossHealth(Math.max(0, Math.round(max - start * e)))
+      store.setCrowd(Math.max(0, Math.round(start - max * e)))
+
+      if (t >= 1 && battleData.current.started) {
+        battleData.current.started = false
+        const win = start >= max
+        const survivors = win ? start - max : 0
+        store.setCrowd(survivors)
+        store.setBossHealth(win ? 0 : Math.max(0, max - start))
+        emitBurst(0, 1.4, BOSS_STOP_Z, win ? '#34d36b' : '#ff5563')
+        game.shake = 0.8
+        store.finish(win ? 'win' : 'lose', survivors)
+      }
+    }
+
+    // --- camera (follow + shake) -------------------------------------------
+    game.shake *= 0.86
+    const sx = (Math.random() - 0.5) * game.shake
+    const sy = (Math.random() - 0.5) * game.shake
+    camera.position.x = lerp(camera.position.x, game.leaderX * 0.5, 0.1) + sx
+    camera.position.y = 6.6 + sy
+    camera.position.z = 11.5
+    camera.lookAt(game.leaderX * 0.25, 1.1, -7)
+  })
+
+  return null
+}
