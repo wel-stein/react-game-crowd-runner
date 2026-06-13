@@ -2,7 +2,6 @@ import { Html } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 import * as THREE from 'three'
-import { BOSS_WORLD_Z } from '../config'
 import { game } from '../state/game'
 import { useGameStore } from '../state/store'
 
@@ -15,7 +14,7 @@ export function Boss() {
 
   useFrame(() => {
     if (!ref.current) return
-    ref.current.position.z = BOSS_WORLD_Z + game.traveled
+    ref.current.position.z = game.level.bossWorldZ + game.traveled
     // idle sway + a flinch when the battle is raging
     const sway = Math.sin(game.time * 1.6) * 0.05
     const flinch = phase === 'battle' ? (Math.random() - 0.5) * 0.25 : 0

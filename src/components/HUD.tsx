@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { DIFFICULTY_ORDER, LEVELS } from '../config'
 import { useGameStore } from '../state/store'
 
 // All 2D UI: crowd counter, progress bar, and the start / win / lose overlays.
@@ -10,8 +11,10 @@ export function HUD() {
   const progress = useGameStore((s) => s.progress)
   const result = useGameStore((s) => s.result)
   const finalCrowd = useGameStore((s) => s.finalCrowd)
+  const difficulty = useGameStore((s) => s.difficulty)
   const start = useGameStore((s) => s.start)
   const restart = useGameStore((s) => s.restart)
+  const toMenu = useGameStore((s) => s.toMenu)
 
   // re-trigger the pop animation whenever the count changes
   const [pop, setPop] = useState(false)
@@ -45,6 +48,7 @@ export function HUD() {
             </div>
             <div className="progress-label">BOSS</div>
           </div>
+          <div className={`difficulty-badge diff-${difficulty}`}>{LEVELS[difficulty].label}</div>
         </>
       )}
 
@@ -57,9 +61,23 @@ export function HUD() {
               <br />
               Pick the best gates, grow your army, crush the boss!
             </p>
-            <button className="btn" onClick={start}>
-              ▶ TAP TO START
-            </button>
+            <p className="choose-label">CHOOSE DIFFICULTY</p>
+            <div className="diff-list">
+              {DIFFICULTY_ORDER.map((id) => {
+                const lvl = LEVELS[id]
+                return (
+                  <button
+                    key={id}
+                    className={`diff-btn diff-${id}`}
+                    onClick={() => start(id)}
+                  >
+                    <span className="diff-name">{lvl.label}</span>
+                    <span className="diff-blurb">{lvl.blurb}</span>
+                    <span className="diff-boss">👹 {lvl.bossHealth}</span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
         </div>
       )}
@@ -73,21 +91,26 @@ export function HUD() {
             <p className="subtitle">
               {result === 'win' ? (
                 <>
-                  Your army stormed the boss!
+                  Your army stormed the <b>{LEVELS[difficulty].label}</b> boss!
                   <br />
                   <b>{finalCrowd}</b> survivors marching on.
                 </>
               ) : (
                 <>
-                  The boss was too strong this time.
+                  The <b>{LEVELS[difficulty].label}</b> boss was too strong this time.
                   <br />
                   Pick smarter gates and try again!
                 </>
               )}
             </p>
-            <button className="btn" onClick={restart}>
-              ⟳ PLAY AGAIN
-            </button>
+            <div className="btn-row">
+              <button className="btn" onClick={restart}>
+                ⟳ PLAY AGAIN
+              </button>
+              <button className="btn btn-secondary" onClick={toMenu}>
+                ☰ CHANGE LEVEL
+              </button>
+            </div>
           </div>
         </div>
       )}

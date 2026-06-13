@@ -24,7 +24,7 @@ export const MAX_X = ROAD_HALF - EDGE_PADDING
 export const LEADER_Z = 0
 
 // --- Speed / pacing ---------------------------------------------------------
-export const RUN_SPEED = 17 // world units travelled per second
+// (run speed is per-difficulty; see LEVELS below)
 export const STEER_LERP = 9 // how snappily the crowd follows the target X
 export const KEY_STEER_SPEED = 11 // units/sec when holding a key
 export const DRAG_RANGE = ROAD_WIDTH * 1.4 // full-screen drag = this much X travel
@@ -47,29 +47,87 @@ const mul = (value: number): Operation => ({ kind: 'mul', value })
 const sub = (value: number): Operation => ({ kind: 'sub', value })
 const div = (value: number): Operation => ({ kind: 'div', value })
 
-// Each section shows two gates. The "right pick" depends on current crowd size,
-// which is what makes the steering decision interesting.
-export const GATE_SECTIONS: SectionSpec[] = [
-  { left: add(15), right: mul(3) },
-  { left: mul(2), right: add(25) },
-  { left: add(30), right: mul(3) },
-  { left: sub(15), right: add(60) },
-  { left: mul(2), right: add(90) },
-  { left: div(2), right: mul(3) },
-  { left: add(120), right: mul(2) },
-  { left: mul(2), right: add(160) },
-]
-
-export const NUM_SECTIONS = GATE_SECTIONS.length
-
-// --- Boss -------------------------------------------------------------------
-export const BOSS_HEALTH = 600
-export const BOSS_WORLD_Z = FIRST_GATE_Z - NUM_SECTIONS * GATE_SPACING - 36
 export const BOSS_STOP_Z = -4 // where the boss comes to rest in front of the crowd
 export const BATTLE_DURATION = 1.8 // seconds of the final clash
 
-// Total distance travelled when the boss fight begins (progress bar = 1.0).
-export const BOSS_TRAVEL = BOSS_STOP_Z - BOSS_WORLD_Z
+// --- Difficulty levels ------------------------------------------------------
+// Each level tunes run speed, boss toughness and the gate sequence. Higher
+// difficulties run faster, throw more penalty gates, and field a tankier boss.
+export type Difficulty = 'easy' | 'medium' | 'hard'
+
+export interface LevelConfig {
+  id: Difficulty
+  label: string
+  blurb: string
+  runSpeed: number // world units travelled per second
+  bossHealth: number
+  sections: SectionSpec[]
+  // derived geometry
+  bossWorldZ: number
+  bossTravel: number
+}
+
+function makeLevel(
+  id: Difficulty,
+  label: string,
+  blurb: string,
+  runSpeed: number,
+  bossHealth: number,
+  sections: SectionSpec[],
+): LevelConfig {
+  const bossWorldZ = FIRST_GATE_Z - sections.length * GATE_SPACING - 36
+  return {
+    id,
+    label,
+    blurb,
+    runSpeed,
+    bossHealth,
+    sections,
+    bossWorldZ,
+    bossTravel: BOSS_STOP_Z - bossWorldZ,
+  }
+}
+
+export const LEVELS: Record<Difficulty, LevelConfig> = {
+  easy: makeLevel('easy', 'Easy', 'Gentle pace · forgiving gates', 17, 600, [
+    { left: add(15), right: mul(3) },
+    { left: mul(2), right: add(25) },
+    { left: add(30), right: mul(3) },
+    { left: sub(15), right: add(60) },
+    { left: mul(2), right: add(90) },
+    { left: div(2), right: mul(3) },
+    { left: add(120), right: mul(2) },
+    { left: mul(2), right: add(160) },
+  ]),
+  medium: makeLevel('medium', 'Medium', 'Faster · more penalty gates', 21, 1400, [
+    { left: add(10), right: mul(3) },
+    { left: mul(2), right: sub(8) },
+    { left: add(20), right: mul(3) },
+    { left: div(2), right: add(40) },
+    { left: sub(15), right: mul(2) },
+    { left: add(60), right: mul(3) },
+    { left: mul(2), right: sub(25) },
+    { left: div(2), right: add(90) },
+    { left: add(120), right: mul(2) },
+    { left: mul(2), right: add(180) },
+  ]),
+  hard: makeLevel('hard', 'Hard', 'Breakneck speed · brutal boss', 26, 3200, [
+    { left: add(8), right: mul(2) },
+    { left: mul(2), right: sub(10) },
+    { left: div(2), right: add(15) },
+    { left: add(25), right: mul(3) },
+    { left: sub(15), right: mul(2) },
+    { left: mul(2), right: div(3) },
+    { left: add(40), right: mul(3) },
+    { left: div(2), right: add(50) },
+    { left: mul(2), right: sub(30) },
+    { left: add(70), right: mul(3) },
+    { left: div(2), right: mul(2) },
+    { left: mul(2), right: add(120) },
+  ]),
+}
+
+export const DIFFICULTY_ORDER: Difficulty[] = ['easy', 'medium', 'hard']
 
 // --- Colors -----------------------------------------------------------------
 export const COLORS = {

@@ -28,6 +28,10 @@ npm run preview    # serve the built bundle locally
 
 ## How to play
 
+- On the start screen, pick a **difficulty**:
+  - 🟢 **Easy** — gentle pace, forgiving gates, boss 600 HP
+  - 🟠 **Medium** — faster, more penalty gates, boss 1400 HP
+  - 🔴 **Hard** — breakneck speed, brutal gate choices, boss 3200 HP
 - **Steer** with mouse/touch drag, or the **arrow keys** / **A** and **D**.
 - You can only move **left/right** — the crowd always runs forward.
 - Each section has **two gates**. Their effect on your crowd:
@@ -66,6 +70,8 @@ src/
 
 ## Tuning difficulty
 
-Everything you'd want to adjust lives in [`src/config.ts`](src/config.ts):
-run speed, gate spacing, the gate sequence (`GATE_SECTIONS`), max crowd size,
-render cap, and boss health.
+Everything you'd want to adjust lives in [`src/config.ts`](src/config.ts).
+The three difficulties are defined in the `LEVELS` map — each sets its own run
+speed, boss health and gate sequence, so you can retune a level or add a new one
+in one place. Shared knobs (gate spacing, max crowd size, render cap) sit
+alongside it.

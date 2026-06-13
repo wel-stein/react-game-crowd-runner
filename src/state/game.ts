@@ -1,4 +1,11 @@
-import { GATE_SECTIONS, FIRST_GATE_Z, GATE_SPACING, type SectionSpec } from '../config'
+import {
+  FIRST_GATE_Z,
+  GATE_SPACING,
+  LEVELS,
+  type Difficulty,
+  type LevelConfig,
+  type SectionSpec,
+} from '../config'
 
 // Live, per-frame mutable game state that is read/written inside useFrame loops.
 // Kept OUT of React/zustand to avoid 60fps re-renders. Components read these
@@ -20,11 +27,12 @@ export interface GameRuntime {
   shake: number // camera shake magnitude (decays)
   battleTime: number
   battleRush: number // how far the crowd has surged into the boss (0..1)
+  level: LevelConfig // active difficulty preset
   sections: LiveSection[]
 }
 
-function buildSections(): LiveSection[] {
-  return GATE_SECTIONS.map((s, i) => ({
+function buildSections(level: LevelConfig): LiveSection[] {
+  return level.sections.map((s, i) => ({
     ...s,
     worldZ: FIRST_GATE_Z - i * GATE_SPACING,
     resolved: false,
@@ -42,7 +50,15 @@ export const game: GameRuntime = {
   shake: 0,
   battleTime: 0,
   battleRush: 0,
-  sections: buildSections(),
+  level: LEVELS.easy,
+  sections: buildSections(LEVELS.easy),
+}
+
+// Pick a difficulty and rebuild the gate layout for it. Called when (re)starting.
+export function startRun(difficulty: Difficulty): void {
+  game.level = LEVELS[difficulty]
+  game.sections = buildSections(game.level)
+  resetRuntime()
 }
 
 export function resetRuntime(): void {
@@ -55,8 +71,6 @@ export function resetRuntime(): void {
   game.shake = 0
   game.battleTime = 0
   game.battleRush = 0
-  // Reset in place so existing component refs (Gates) keep pointing at the same
-  // section objects across restarts.
   for (const s of game.sections) {
     s.resolved = false
     s.chosen = null

@@ -200,3 +200,104 @@ body {
   transform: translateY(4px);
   box-shadow: 0 2px 0 #d96f12, 0 6px 12px rgba(0, 0, 0, 0.25);
 }
+.btn-secondary {
+  background: linear-gradient(180deg, #8a98ad, #6c7a90);
+  box-shadow: 0 6px 0 #4d5970, 0 10px 18px rgba(0, 0, 0, 0.25);
+}
+.btn-secondary:active {
+  box-shadow: 0 2px 0 #4d5970, 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* ---------------- difficulty selector ---------------- */
+.choose-label {
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #7b8aa0;
+  margin-bottom: 12px;
+}
+.diff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.diff-btn {
+  pointer-events: auto;
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  border-radius: 16px;
+  padding: 14px 18px;
+  color: #fff;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 'name boss' 'blurb boss';
+  align-items: center;
+  column-gap: 10px;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.22), 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+}
+.diff-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.22), 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+.diff-name {
+  grid-area: name;
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: 1px;
+}
+.diff-blurb {
+  grid-area: blurb;
+  font-weight: 600;
+  font-size: 13px;
+  opacity: 0.92;
+}
+.diff-boss {
+  grid-area: boss;
+  font-weight: 900;
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.18);
+  padding: 4px 10px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.diff-easy {
+  background: linear-gradient(180deg, #45d27a, #2bb061);
+}
+.diff-medium {
+  background: linear-gradient(180deg, #ffb13b, #f5901e);
+}
+.diff-hard {
+  background: linear-gradient(180deg, #ff6a6a, #e23b4a);
+}
+
+.difficulty-badge {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 99px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+}
+.difficulty-badge.diff-easy {
+  background: #2bb061;
+}
+.difficulty-badge.diff-medium {
+  background: #f5901e;
+}
+.difficulty-badge.diff-hard {
+  background: #e23b4a;
+}

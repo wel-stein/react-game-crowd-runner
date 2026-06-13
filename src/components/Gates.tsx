@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import * as THREE from 'three'
 import { opColor, opLabel, ROAD_WIDTH, type Operation } from '../config'
 import { game, type LiveSection } from '../state/game'
+import { useGameStore } from '../state/store'
 
 const GATE_W = ROAD_WIDTH / 2 - 0.15
 const GATE_H = 3.2
@@ -90,8 +91,11 @@ const SCALE_HIDE = new THREE.Vector3(0.85, 0.85, 0.85)
 const SCALE_ONE = new THREE.Vector3(1, 1, 1)
 
 export function Gates() {
+  // Re-read game.sections (and remount) whenever a new run starts so the gate
+  // layout matches the chosen difficulty.
+  const runId = useGameStore((s) => s.runId)
   return (
-    <group>
+    <group key={runId}>
       {game.sections.map((s, i) => (
         <Section key={i} section={s} />
       ))}

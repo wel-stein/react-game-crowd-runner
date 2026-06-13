@@ -4,13 +4,10 @@ import {
   applyOp,
   BATTLE_DURATION,
   BOSS_STOP_Z,
-  BOSS_WORLD_Z,
-  BOSS_TRAVEL,
   GATE_HIT_Z,
   KEY_STEER_SPEED,
   MAX_X,
   opColor,
-  RUN_SPEED,
   STEER_LERP,
 } from '../config'
 import { useControls } from '../hooks/useControls'
@@ -43,8 +40,8 @@ export function GameController() {
       game.leaderX = lerp(game.leaderX, game.targetX, Math.min(1, dt * STEER_LERP))
 
       // --- world scroll -----------------------------------------------------
-      game.traveled += RUN_SPEED * dt
-      store.setProgress(clamp(game.traveled / BOSS_TRAVEL, 0, 1))
+      game.traveled += game.level.runSpeed * dt
+      store.setProgress(clamp(game.traveled / game.level.bossTravel, 0, 1))
 
       // --- gate resolution --------------------------------------------------
       for (const section of game.sections) {
@@ -64,9 +61,9 @@ export function GameController() {
       }
 
       // --- boss trigger -----------------------------------------------------
-      const bossRenderZ = BOSS_WORLD_Z + game.traveled
+      const bossRenderZ = game.level.bossWorldZ + game.traveled
       if (bossRenderZ >= BOSS_STOP_Z) {
-        game.traveled = BOSS_STOP_Z - BOSS_WORLD_Z // freeze the world
+        game.traveled = BOSS_STOP_Z - game.level.bossWorldZ // freeze the world
         battleData.current = { startCrowd: store.crowd, started: true, casualtyTimer: 0 }
         game.battleTime = 0
         store.beginBattle()
