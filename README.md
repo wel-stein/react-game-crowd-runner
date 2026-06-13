@@ -1,14 +1,30 @@
-# 🏃 Crowd Runner
+# 🎮 Game Hub
 
-A browser-based **crowd runner** game in the style of *Count Masters* / *Join
-Clash*. Steer a growing army of stick-figure units down an endless road, pick
-the best multiplier/adder gates, and smash the whole crowd into the boss at the
-end.
+A browser-based **mini-game hub**. The home screen shows a grid of game cards;
+tap one to play. Each game is a fully **isolated, self-contained module** —
+its own state, runtime, effects and styles — and is **lazy-loaded** so only one
+game's code ever runs at a time. Adding a game is just a new folder + a registry
+entry.
 
 Built with **Vite + React + TypeScript**, **React Three Fiber** + **drei** for
-the 3D scene, and **Zustand** for game state. The crowd is rendered with
-**instanced meshes** so hundreds of units draw in just two draw calls and stay
-at 60fps. No backend — it deploys as a fully static site.
+the 3D scenes, and **Zustand** for per-game state. Crowds render with
+**instanced meshes** so hundreds of units draw in a couple of draw calls at
+60fps. No backend — it deploys as a fully static site.
+
+## Games
+
+### 🏃 Crowd Runner
+
+Steer a growing army down the road, choosing between paired `+N` / `×N` gates
+(and dodging `-N` / `÷N` penalties), then smash the crowd into a boss with a
+health bar. Three difficulties; Medium/Hard add telegraphed boss slams.
+
+### 🧱 Wall Rush
+
+A different loop: run a corridor with a blue **`+1`** wall on the left and a gold
+**`+99`** wall on the right. **Hug a wall to collect that row's value** as the
+crowd passes it — the gold wall grows you fast but is studded with red **`÷2`**
+traps, so swerve to the centre lane to dodge them before smashing a stone golem.
 
 ## Quick start
 
@@ -28,56 +44,53 @@ npm run preview    # serve the built bundle locally
 
 ## How to play
 
-- On the start screen, pick a **difficulty**:
-  - 🟢 **Easy** — gentle pace, forgiving gates, boss 600 HP
-  - 🟠 **Medium** — faster, more penalty gates, boss 1400 HP
-  - 🔴 **Hard** — breakneck speed, brutal gate choices, boss 3200 HP
-- **Steer** with mouse/touch drag, or the **arrow keys** / **A** and **D**.
-- You can only move **left/right** — the crowd always runs forward.
-- Each section has **two gates**. Their effect on your crowd:
-  - 🟢 `+N` — adds units
-  - 🟡 `×N` — multiplies your crowd (huge late game)
-  - 🔴 `-N` / `÷N` — penalty gates, avoid these!
-- The best pick depends on your **current crowd size** (`+20` beats `×2` when
-  you're small; `×2` wins once you're big).
-- On Medium/Hard the boss **slams** the road during the final approach — a
-  flashing red half-lane warns you which side to dodge, or you lose runners.
-- Reach the **boss** at the end: if your crowd ≥ the boss's health, you win.
-- **Pause** any time with **Esc** / **P** (or the on-screen button); the game
-  also auto-pauses if you switch tabs.
+- From the **home screen**, tap a game card to start. A **‹ Games** button on
+  each game's title screen returns you to the hub.
+- Pick a **difficulty** (Easy / Medium / Hard) — each tunes speed, boss health
+  and hazards.
+- **Steer** with mouse/touch drag, or the **arrow keys** / **A** and **D**. You
+  only move left/right — the crowd always runs forward.
+- **Pause** with **Esc** / **P** (or the on-screen button); games auto-pause if
+  you switch tabs.
 - Win to earn a **1–3 star** rating and a **score** — your best per difficulty
-  is saved locally and shown on the menu.
+  is saved locally (per game) and shown on the menu.
 
 ## Project structure
 
 ```
 src/
-  config.ts            # all tunable constants (speed, gates, boss health, ...)
-  state/
-    store.ts           # zustand store (React-facing game state)
-    game.ts            # per-frame mutable runtime (kept out of React)
-  hooks/
-    useControls.ts     # pointer-drag + keyboard steering
-  utils/
-    math.ts            # clamp / lerp / easing / hash
-    formation.ts       # clustered crowd "blob" layout
-    effects.ts         # imperative particle-burst event bus
-  components/
-    Scene.tsx          # Canvas, lights, fog, assembles the world
-    GameController.tsx # the core game loop
-    Crowd.tsx          # instanced-mesh crowd
-    Gates.tsx          # gate sections + operations
-    Boss.tsx           # boss model + health number
-    Road.tsx           # scrolling road
-    Background.tsx     # hills + grass
-    Particles.tsx      # pooled instanced particle bursts
-    HUD.tsx            # 2D UI + start/win/lose overlays
+  main.tsx                 # entry
+  App.tsx                  # hub: lazy-loads the active game, else shows Launcher
+  launcher/
+    Launcher.tsx           # home screen (game cards)
+    registry.ts            # game metadata (id, title, icon, accent)
+    launcher.css
+  games/
+    crowd-runner/          # ── fully isolated game ──────────────
+      CrowdRunnerGame.tsx  # self-contained root (own scene + HUD + CSS)
+      config.ts            # tunables incl. the LEVELS difficulty map
+      state/ hooks/ utils/ components/
+      crowd-runner.css
+    wall-rush/             # ── fully isolated game ──────────────
+      WallRushGame.tsx     # corridor +1/+99 wall-collection mechanic
+      config.ts state/ hooks/ utils/ components/
+      wall-rush.css
 ```
 
-## Tuning difficulty
+### Isolation & adding a game
 
-Everything you'd want to adjust lives in [`src/config.ts`](src/config.ts).
-The three difficulties are defined in the `LEVELS` map — each sets its own run
-speed, boss health and gate sequence, so you can retune a level or add a new one
-in one place. Shared knobs (gate spacing, max crowd size, render cap) sit
-alongside it.
+Each game owns **everything** — its zustand store, per-frame runtime singleton,
+particle-effects bus, config, components and CSS (classes are namespaced, e.g.
+`wr-*` for Wall Rush). Games are **lazy-loaded** in `App.tsx`, so a game's code
+and globals don't even exist until you open it, and only one game is ever
+mounted — they cannot interfere with each other.
+
+To add a game: create `src/games/<id>/<Name>Game.tsx` exporting a component that
+takes `{ onExit }`, add a `lazy()` entry in `App.tsx`, and a card in
+`launcher/registry.ts`.
+
+### Tuning difficulty
+
+Each game's tunables live in its own `config.ts`. Difficulties are defined in a
+`LEVELS` map (run speed, boss health, gate/wall layout, score multiplier), so
+you can retune or add a level in one place per game.

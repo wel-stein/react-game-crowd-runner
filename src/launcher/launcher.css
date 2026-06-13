@@ -1,0 +1,137 @@
+/* Launcher / home-screen styles. Self-contained (hub- prefixed). */
+:root {
+  font-family: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  overscroll-behavior: none;
+}
+
+.hub-root {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  background: radial-gradient(circle at 50% 0%, #2a3f6b, #131a2e 70%);
+  color: #fff;
+}
+
+.hub-inner {
+  min-height: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: max(28px, env(safe-area-inset-top)) 20px 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.hub-head {
+  text-align: center;
+  margin: 18px 0 26px;
+}
+.hub-title {
+  font-size: clamp(32px, 9vw, 48px);
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+}
+.hub-sub {
+  margin-top: 6px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #aebbd6;
+}
+
+.hub-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hub-card {
+  pointer-events: auto;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  color: #fff;
+  text-align: left;
+  border-radius: 22px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.28), 0 14px 26px rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.hub-card:active {
+  transform: translateY(5px);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.28), 0 8px 16px rgba(0, 0, 0, 0.35);
+}
+.hub-card-icon {
+  font-size: 46px;
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+}
+.hub-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hub-card-title {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+.hub-card-tag {
+  font-size: 13.5px;
+  font-weight: 600;
+  opacity: 0.92;
+  line-height: 1.35;
+}
+.hub-card-play {
+  font-size: 22px;
+  opacity: 0.9;
+}
+
+.hub-foot {
+  margin-top: auto;
+  padding-top: 28px;
+  text-align: center;
+  color: #6f7ea0;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* loading fallback while a game's code chunk downloads */
+.hub-loader {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #131a2e;
+  color: #aebbd6;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 1px;
+}

@@ -35,6 +35,26 @@ body {
   touch-action: none;
 }
 
+/* home button shown on the game's start screen */
+.game-back {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  z-index: 20;
+  pointer-events: auto;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.32);
+  color: #fff;
+  font-weight: 900;
+  font-size: 15px;
+  padding: 8px 14px;
+}
+.game-back:active {
+  transform: scale(0.95);
+}
+
 /* ---------------- HUD ---------------- */
 .hud {
   position: absolute;
