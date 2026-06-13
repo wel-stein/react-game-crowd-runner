@@ -31,7 +31,10 @@ export const DRAG_RANGE = ROAD_WIDTH * 1.4 // full-screen drag = this much X tra
 
 // --- Crowd ------------------------------------------------------------------
 export const START_CROWD = 1
-export const MAX_CROWD = 2000 // logical clamp
+// Logical clamp on the crowd count. Must stay above the toughest boss's HP so
+// that level is winnable. Rendering is capped separately by MAX_RENDER, so this
+// is purely a gameplay/number ceiling and has no performance cost.
+export const MAX_CROWD = 9999
 export const MAX_RENDER = 600 // hard cap on rendered instances (perf)
 export const CROWD_BOB_SPEED = 9
 export const CROWD_BOB_HEIGHT = 0.09
