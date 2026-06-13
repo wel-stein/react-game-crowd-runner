@@ -72,14 +72,16 @@ export function Boss() {
         <meshStandardMaterial color="#ff3030" emissive="#ff3030" emissiveIntensity={1.2} />
       </mesh>
 
-      <Html center position={[0, 6.7, 0]} distanceFactor={16} style={{ pointerEvents: 'none' }}>
-        <div className="boss-hp">
-          <div className="boss-hp-num">👹 {bossHealth}</div>
-          <div className="boss-hp-track">
-            <div className="boss-hp-fill" style={{ width: `${pct}%` }} />
+      {(phase === 'playing' || phase === 'battle') && (
+        <Html center position={[0, 6.7, 0]} distanceFactor={16} style={{ pointerEvents: 'none' }}>
+          <div className="boss-hp">
+            <div className="boss-hp-num">👹 {bossHealth}</div>
+            <div className="boss-hp-track">
+              <div className="boss-hp-fill" style={{ width: `${pct}%` }} />
+            </div>
           </div>
-        </div>
-      </Html>
+        </Html>
+      )}
     </group>
   )
 }

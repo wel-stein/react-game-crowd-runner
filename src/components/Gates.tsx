@@ -10,7 +10,7 @@ const GATE_W = ROAD_WIDTH / 2 - 0.15
 const GATE_H = 3.2
 const GATE_X = ROAD_WIDTH / 4
 
-function GatePanel({ op, x }: { op: Operation; x: number }) {
+function GatePanel({ op, x, showLabel }: { op: Operation; x: number; showLabel: boolean }) {
   const color = opColor(op.kind)
   return (
     <group position={[x, GATE_H / 2, 0]}>
@@ -41,14 +41,16 @@ function GatePanel({ op, x }: { op: Operation; x: number }) {
         <boxGeometry args={[GATE_W + 0.2, 0.22, 0.18]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.4} />
       </mesh>
-      <Html center position={[0, 0.2, 0.05]} distanceFactor={11} style={{ pointerEvents: 'none' }}>
-        <div className="gate-label">{opLabel(op)}</div>
-      </Html>
+      {showLabel && (
+        <Html center position={[0, 0.2, 0.05]} distanceFactor={11} style={{ pointerEvents: 'none' }}>
+          <div className="gate-label">{opLabel(op)}</div>
+        </Html>
+      )}
     </group>
   )
 }
 
-function Section({ section }: { section: LiveSection }) {
+function Section({ section, showLabels }: { section: LiveSection; showLabels: boolean }) {
   const ref = useRef<THREE.Group>(null!)
   const leftRef = useRef<THREE.Group>(null!)
   const rightRef = useRef<THREE.Group>(null!)
@@ -77,10 +79,10 @@ function Section({ section }: { section: LiveSection }) {
   return (
     <group ref={ref}>
       <group ref={leftRef}>
-        <GatePanel op={section.left} x={-GATE_X} />
+        <GatePanel op={section.left} x={-GATE_X} showLabel={showLabels} />
       </group>
       <group ref={rightRef}>
-        <GatePanel op={section.right} x={GATE_X} />
+        <GatePanel op={section.right} x={GATE_X} showLabel={showLabels} />
       </group>
     </group>
   )
@@ -94,10 +96,12 @@ export function Gates() {
   // Re-read game.sections (and remount) whenever a new run starts so the gate
   // layout matches the chosen difficulty.
   const runId = useGameStore((s) => s.runId)
+  const phase = useGameStore((s) => s.phase)
+  const showLabels = phase === 'playing' || phase === 'battle'
   return (
     <group key={runId}>
       {game.sections.map((s, i) => (
-        <Section key={i} section={s} />
+        <Section key={i} section={s} showLabels={showLabels} />
       ))}
     </group>
   )
