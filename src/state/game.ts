@@ -17,6 +17,13 @@ export interface LiveSection extends SectionSpec {
   chosen: 'left' | 'right' | null
 }
 
+export interface Slam {
+  at: number // progress (0..1) at which the telegraph begins
+  side: -1 | 1 // which half of the road is dangerous
+  warnStart: number | null // game.time when telegraph started
+  resolved: boolean
+}
+
 export interface GameRuntime {
   time: number // accumulated run time (for animation)
   traveled: number // distance scrolled toward the boss
@@ -29,6 +36,7 @@ export interface GameRuntime {
   battleRush: number // how far the crowd has surged into the boss (0..1)
   level: LevelConfig // active difficulty preset
   sections: LiveSection[]
+  slams: Slam[]
 }
 
 function buildSections(level: LevelConfig): LiveSection[] {
@@ -38,6 +46,18 @@ function buildSections(level: LevelConfig): LiveSection[] {
     resolved: false,
     chosen: null,
   }))
+}
+
+// Schedule the boss's telegraphed slams across the final approach (progress
+// 0.80 .. 0.92), alternating sides so the player must steer to the safe half.
+function buildSlams(level: LevelConfig): Slam[] {
+  const n = level.slamCount
+  const slams: Slam[] = []
+  for (let i = 0; i < n; i++) {
+    const at = n === 1 ? 0.86 : 0.8 + (0.12 * i) / (n - 1)
+    slams.push({ at, side: i % 2 === 0 ? -1 : 1, warnStart: null, resolved: false })
+  }
+  return slams
 }
 
 export const game: GameRuntime = {
@@ -52,12 +72,14 @@ export const game: GameRuntime = {
   battleRush: 0,
   level: LEVELS.easy,
   sections: buildSections(LEVELS.easy),
+  slams: buildSlams(LEVELS.easy),
 }
 
 // Pick a difficulty and rebuild the gate layout for it. Called when (re)starting.
 export function startRun(difficulty: Difficulty): void {
   game.level = LEVELS[difficulty]
   game.sections = buildSections(game.level)
+  game.slams = buildSlams(game.level)
   resetRuntime()
 }
 

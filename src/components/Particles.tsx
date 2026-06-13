@@ -31,6 +31,7 @@ export function Particles() {
   const geo = useMemo(() => new THREE.IcosahedronGeometry(0.12, 0), [])
 
   useEffect(() => {
+    if (ref.current) ref.current.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
     return onBurst((x, y, z, hex) => {
       color.set(hex)
       for (let i = 0; i < PER_BURST; i++) {

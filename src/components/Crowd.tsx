@@ -6,11 +6,13 @@ import {
   CROWD_BOB_HEIGHT,
   CROWD_BOB_SPEED,
   LEADER_Z,
+  MAX_CROWD,
   MAX_RENDER,
 } from '../config'
 import { game } from '../state/game'
 import { useGameStore } from '../state/store'
 import { FORMATION } from '../utils/formation'
+import { clamp } from '../utils/math'
 
 const dummy = new THREE.Object3D()
 const color = new THREE.Color()
@@ -30,9 +32,11 @@ export function Crowd() {
   const bodyGeo = useMemo(() => new THREE.CapsuleGeometry(0.17, 0.34, 4, 8), [])
   const headGeo = useMemo(() => new THREE.SphereGeometry(0.15, 10, 8), [])
 
-  // assign slightly varied body colors once
+  // assign slightly varied body colors once + flag buffers as frequently updated
   useEffect(() => {
-    if (!bodies.current) return
+    if (!bodies.current || !heads.current) return
+    bodies.current.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
+    heads.current.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
     for (let i = 0; i < MAX_RENDER; i++) {
       const h = 0.58 + (FORMATION[i].bodyHue - 0.5) * 0.12
       color.setHSL(h, 0.6, 0.55)
@@ -52,6 +56,10 @@ export function Crowd() {
     // cluster scale grows with crowd size so big armies spread out a little
     const spread = 0.85 + Math.min(crowd, MAX_RENDER) / MAX_RENDER * 0.5
     const rush = phase === 'battle' ? game.battleRush * (LEADER_Z - BOSS_STOP_Z + 1.5) : 0
+    // once the crowd exceeds the render cap, scale units up so a maxed-out army
+    // still reads as "bigger" even though the instance count is capped
+    const over = clamp((crowd - MAX_RENDER) / (MAX_CROWD - MAX_RENDER), 0, 1)
+    const unitScale = 1 + over * 0.35
 
     for (let i = 0; i < MAX_RENDER; i++) {
       if (i < count) {
@@ -60,14 +68,14 @@ export function Crowd() {
         const x = game.leaderX + f.x * spread
         const z = LEADER_Z + f.z * spread - rush
         // body
-        dummy.position.set(x, 0.34 + Math.max(0, bob), z)
+        dummy.position.set(x, (0.34 + Math.max(0, bob)) * unitScale, z)
         dummy.rotation.set(0, 0, 0)
-        dummy.scale.setScalar(1)
+        dummy.scale.setScalar(unitScale)
         dummy.updateMatrix()
         bodies.current.setMatrixAt(i, dummy.matrix)
         // head
-        dummy.position.set(x, 0.68 + Math.max(0, bob), z)
-        dummy.scale.setScalar(1)
+        dummy.position.set(x, (0.68 + Math.max(0, bob)) * unitScale, z)
+        dummy.scale.setScalar(unitScale)
         dummy.updateMatrix()
         heads.current.setMatrixAt(i, dummy.matrix)
       } else {

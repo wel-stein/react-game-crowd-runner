@@ -8,12 +8,15 @@ import {
   KEY_STEER_SPEED,
   MAX_X,
   opColor,
+  SLAM_CULL,
+  SLAM_TELEGRAPH,
   STEER_LERP,
 } from '../config'
 import { useControls } from '../hooks/useControls'
 import { game } from '../state/game'
 import { useGameStore } from '../state/store'
 import { emitBurst } from '../utils/effects'
+import { SHAKE_SCALE } from '../utils/env'
 import { clamp, easeOutCubic, lerp } from '../utils/math'
 
 // Owns the whole game loop: steering, world scroll, gate resolution, boss
@@ -29,6 +32,8 @@ export function GameController() {
     const dt = Math.min(rawDt, 0.05)
     const store = useGameStore.getState()
     const phase = store.phase
+
+    if (store.paused) return // freeze the world while paused
 
     if (phase === 'playing') {
       game.time += dt
@@ -60,13 +65,33 @@ export function GameController() {
         }
       }
 
+      // --- boss slams -------------------------------------------------------
+      // During the final approach the boss telegraphs a slam on one half of the
+      // road; if the crowd is on that side (or dithering in the middle) when it
+      // lands, a chunk of runners is culled. Steer to the safe side to dodge.
+      const progress = game.traveled / game.level.bossTravel
+      for (const slam of game.slams) {
+        if (slam.resolved) continue
+        if (slam.warnStart === null) {
+          if (progress >= slam.at) slam.warnStart = game.time
+        } else if (game.time - slam.warnStart >= SLAM_TELEGRAPH) {
+          slam.resolved = true
+          const caught = Math.sign(game.leaderX) === slam.side || Math.abs(game.leaderX) < 0.6
+          if (caught) {
+            store.setCrowd(Math.max(0, Math.round(store.crowd * (1 - SLAM_CULL))))
+            emitBurst(slam.side * 2.4, 0.6, GATE_HIT_Z, '#ff5563')
+            game.shake = Math.min(game.shake + 0.6, 0.9)
+          }
+        }
+      }
+
       // --- boss trigger -----------------------------------------------------
       const bossRenderZ = game.level.bossWorldZ + game.traveled
       if (bossRenderZ >= BOSS_STOP_Z) {
         game.traveled = BOSS_STOP_Z - game.level.bossWorldZ // freeze the world
         battleData.current = { startCrowd: store.crowd, started: true, casualtyTimer: 0 }
         game.battleTime = 0
-        store.beginBattle()
+        store.beginBattle(store.crowd)
       }
     } else if (phase === 'battle') {
       game.time += dt
@@ -100,14 +125,15 @@ export function GameController() {
         store.setBossHealth(win ? 0 : Math.max(0, max - start))
         emitBurst(0, 1.4, BOSS_STOP_Z, win ? '#34d36b' : '#ff5563')
         game.shake = 0.8
-        store.finish(win ? 'win' : 'lose', survivors)
+        store.finish(win ? 'win' : 'lose', survivors, start)
       }
     }
 
     // --- camera (follow + shake) -------------------------------------------
     game.shake *= 0.86
-    const sx = (Math.random() - 0.5) * game.shake
-    const sy = (Math.random() - 0.5) * game.shake
+    const shakeAmt = game.shake * SHAKE_SCALE
+    const sx = (Math.random() - 0.5) * shakeAmt
+    const sy = (Math.random() - 0.5) * shakeAmt
     camera.position.x = lerp(camera.position.x, game.leaderX * 0.5, 0.1) + sx
     camera.position.y = 6.6 + sy
     camera.position.z = 11.5

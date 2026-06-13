@@ -10,7 +10,9 @@ import { useGameStore } from '../state/store'
 export function Boss() {
   const ref = useRef<THREE.Group>(null!)
   const bossHealth = useGameStore((s) => s.bossHealth)
+  const bossMax = useGameStore((s) => s.bossMax)
   const phase = useGameStore((s) => s.phase)
+  const pct = Math.max(0, Math.min(1, bossHealth / bossMax)) * 100
 
   useFrame(() => {
     if (!ref.current) return
@@ -70,8 +72,13 @@ export function Boss() {
         <meshStandardMaterial color="#ff3030" emissive="#ff3030" emissiveIntensity={1.2} />
       </mesh>
 
-      <Html center position={[0, 6.6, 0]} distanceFactor={16} style={{ pointerEvents: 'none' }}>
-        <div className="boss-health">{bossHealth}</div>
+      <Html center position={[0, 6.7, 0]} distanceFactor={16} style={{ pointerEvents: 'none' }}>
+        <div className="boss-hp">
+          <div className="boss-hp-num">👹 {bossHealth}</div>
+          <div className="boss-hp-track">
+            <div className="boss-hp-fill" style={{ width: `${pct}%` }} />
+          </div>
+        </div>
       </Html>
     </group>
   )

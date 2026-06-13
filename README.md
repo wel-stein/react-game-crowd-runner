@@ -40,7 +40,13 @@ npm run preview    # serve the built bundle locally
   - 🔴 `-N` / `÷N` — penalty gates, avoid these!
 - The best pick depends on your **current crowd size** (`+20` beats `×2` when
   you're small; `×2` wins once you're big).
+- On Medium/Hard the boss **slams** the road during the final approach — a
+  flashing red half-lane warns you which side to dodge, or you lose runners.
 - Reach the **boss** at the end: if your crowd ≥ the boss's health, you win.
+- **Pause** any time with **Esc** / **P** (or the on-screen button); the game
+  also auto-pauses if you switch tabs.
+- Win to earn a **1–3 star** rating and a **score** — your best per difficulty
+  is saved locally and shown on the menu.
 
 ## Project structure
 

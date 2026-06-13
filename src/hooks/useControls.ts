@@ -34,12 +34,23 @@ export function useControls(): void {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') game.keyLeft = true
       if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') game.keyRight = true
+      if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
+        useGameStore.getState().togglePause()
+      }
     }
     const onKeyUp = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') game.keyLeft = false
       if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') game.keyRight = false
     }
 
+    const onVisibility = () => {
+      const st = useGameStore.getState()
+      if (document.hidden && (st.phase === 'playing' || st.phase === 'battle') && !st.paused) {
+        st.togglePause()
+      }
+    }
+
+    document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('pointerdown', onPointerDown)
     window.addEventListener('pointermove', onPointerMove)
     window.addEventListener('pointerup', endDrag)
@@ -48,6 +59,7 @@ export function useControls(): void {
     window.addEventListener('keyup', onKeyUp)
 
     return () => {
+      document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('pointerdown', onPointerDown)
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('pointerup', endDrag)

@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { COLORS } from '../config'
 import { Background } from './Background'
 import { Boss } from './Boss'
+import { BossSlams } from './BossSlams'
 import { Crowd } from './Crowd'
 import { GameController } from './GameController'
 import { Gates } from './Gates'
@@ -39,6 +40,7 @@ export function Scene() {
       <Background />
       <Road />
       <Gates />
+      <BossSlams />
       <Boss />
       <Crowd />
       <Particles />

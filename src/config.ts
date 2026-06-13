@@ -53,6 +53,10 @@ const div = (value: number): Operation => ({ kind: 'div', value })
 export const BOSS_STOP_Z = -4 // where the boss comes to rest in front of the crowd
 export const BATTLE_DURATION = 1.8 // seconds of the final clash
 
+// --- Boss slam attack -------------------------------------------------------
+export const SLAM_TELEGRAPH = 0.85 // seconds the danger zone flashes before impact
+export const SLAM_CULL = 0.2 // fraction of the crowd lost if caught in a slam
+
 // --- Difficulty levels ------------------------------------------------------
 // Each level tunes run speed, boss toughness and the gate sequence. Higher
 // difficulties run faster, throw more penalty gates, and field a tankier boss.
@@ -64,6 +68,8 @@ export interface LevelConfig {
   blurb: string
   runSpeed: number // world units travelled per second
   bossHealth: number
+  slamCount: number // telegraphed boss slams during the final approach
+  scoreMult: number // difficulty bonus applied to score
   sections: SectionSpec[]
   // derived geometry
   bossWorldZ: number
@@ -76,6 +82,8 @@ function makeLevel(
   blurb: string,
   runSpeed: number,
   bossHealth: number,
+  slamCount: number,
+  scoreMult: number,
   sections: SectionSpec[],
 ): LevelConfig {
   const bossWorldZ = FIRST_GATE_Z - sections.length * GATE_SPACING - 36
@@ -85,6 +93,8 @@ function makeLevel(
     blurb,
     runSpeed,
     bossHealth,
+    slamCount,
+    scoreMult,
     sections,
     bossWorldZ,
     bossTravel: BOSS_STOP_Z - bossWorldZ,
@@ -92,7 +102,7 @@ function makeLevel(
 }
 
 export const LEVELS: Record<Difficulty, LevelConfig> = {
-  easy: makeLevel('easy', 'Easy', 'Gentle pace · forgiving gates', 17, 600, [
+  easy: makeLevel('easy', 'Easy', 'Gentle pace · forgiving gates', 17, 600, 0, 1, [
     { left: add(15), right: mul(3) },
     { left: mul(2), right: add(25) },
     { left: add(30), right: mul(3) },
@@ -102,7 +112,7 @@ export const LEVELS: Record<Difficulty, LevelConfig> = {
     { left: add(120), right: mul(2) },
     { left: mul(2), right: add(160) },
   ]),
-  medium: makeLevel('medium', 'Medium', 'Faster · more penalty gates', 21, 1400, [
+  medium: makeLevel('medium', 'Medium', 'Faster · boss slams', 21, 1400, 1, 1.6, [
     { left: add(10), right: mul(3) },
     { left: mul(2), right: sub(8) },
     { left: add(20), right: mul(3) },
@@ -114,7 +124,7 @@ export const LEVELS: Record<Difficulty, LevelConfig> = {
     { left: add(120), right: mul(2) },
     { left: mul(2), right: add(180) },
   ]),
-  hard: makeLevel('hard', 'Hard', 'Breakneck speed · brutal boss', 26, 3200, [
+  hard: makeLevel('hard', 'Hard', 'Breakneck · brutal boss slams', 26, 3200, 2, 2.6, [
     { left: add(8), right: mul(2) },
     { left: mul(2), right: sub(10) },
     { left: div(2), right: add(15) },
