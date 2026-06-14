@@ -26,6 +26,13 @@ A different loop: run a corridor with a blue **`+1`** wall on the left and a gol
 crowd passes it — the gold wall grows you fast but is studded with red **`÷2`**
 traps, so swerve to the centre lane to dodge them before smashing a stone golem.
 
+### ⚔️ Crowd Clash
+
+Race a **red rival army**. Each section you take the gate on your lane and the
+rival's AI grabs a gate too (sized against *its* crowd), so both counts grow
+live — a running **lead indicator** shows who's ahead. At the end the two armies
+collide and the bigger one wins. Difficulty sets the rival's smarts (50% → 92%).
+
 ## Quick start
 
 ```bash

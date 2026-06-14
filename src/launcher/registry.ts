@@ -24,4 +24,11 @@ export const GAMES: GameMeta[] = [
     emoji: '🧱',
     accent: '#ff4fd8',
   },
+  {
+    id: 'crowd-clash',
+    title: 'Crowd Clash',
+    tagline: 'Out-grow the red rival army and win the final clash',
+    emoji: '⚔️',
+    accent: '#ff7a3a',
+  },
 ]

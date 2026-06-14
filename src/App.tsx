@@ -14,6 +14,9 @@ const GAME_COMPONENTS: Record<string, ComponentType<GameProps>> = {
   'wall-rush': lazy(() =>
     import('./games/wall-rush/WallRushGame').then((m) => ({ default: m.WallRushGame })),
   ),
+  'crowd-clash': lazy(() =>
+    import('./games/crowd-clash/CrowdClashGame').then((m) => ({ default: m.CrowdClashGame })),
+  ),
 }
 
 export default function App() {
