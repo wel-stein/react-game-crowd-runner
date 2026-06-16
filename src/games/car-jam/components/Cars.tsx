@@ -6,8 +6,22 @@ import { useCarStore } from '../state/store'
 import { carCenter, type Car as CarData } from '../utils/grid'
 import { SHAKE_SCALE } from '../utils/env'
 
-const UP = new THREE.Vector3(0, 1, 0)
 const easeOut = (t: number) => 1 - (1 - t) * (1 - t)
+
+// A flat triangular arrow lying in the roof plane (XZ), apex pointing +X. It's
+// the same mesh for every car — only the per-car yaw differs — so it reads as a
+// crisp directional arrow from every angle (a side-on cone looked like a
+// diamond when it pointed toward the camera).
+const ARROW_GEOMETRY = (() => {
+  const g = new THREE.BufferGeometry()
+  g.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute([0.26, 0, 0, -0.18, 0, -0.2, -0.18, 0, 0.2], 3),
+  )
+  g.setIndex([0, 1, 2])
+  g.computeVertexNormals()
+  return g
+})()
 
 function Car({ car }: { car: CarData }) {
   const cols = useCarStore((s) => s.cols)
@@ -35,12 +49,8 @@ function Car({ car }: { car: CarData }) {
       ? [along * 0.5, CAR_HEIGHT * 0.7, CAR_WIDTH * 0.78]
       : [CAR_WIDTH * 0.78, CAR_HEIGHT * 0.7, along * 0.5]
 
-  // arrow: cone pointing along the exit direction, laid flat on the roof
-  const arrowQuat = useMemo(() => {
-    const q = new THREE.Quaternion()
-    q.setFromUnitVectors(UP, new THREE.Vector3(dc, 0, dr))
-    return q
-  }, [dc, dr])
+  // yaw that turns the flat +X arrow to face the exit direction [dc, 0, dr]
+  const arrowYaw = useMemo(() => Math.atan2(-dr, dc), [dc, dr])
 
   const exitDist = (Math.max(cols, rows) + car.len) * CELL_SIZE + 2
 
@@ -102,10 +112,13 @@ function Car({ car }: { car: CarData }) {
           metalness={0.2}
         />
       </mesh>
-      {/* white direction arrow on the roof */}
-      <mesh position={[0, CAR_HEIGHT * 0.55 + 0.12, 0]} quaternion={arrowQuat}>
-        <coneGeometry args={[0.2, 0.34, 4]} />
-        <meshStandardMaterial color="#ffffff" roughness={0.5} />
+      {/* white direction arrow lying flat on the roof */}
+      <mesh
+        geometry={ARROW_GEOMETRY}
+        position={[0, CAR_HEIGHT * 0.9 + 0.02, 0]}
+        rotation={[0, arrowYaw, 0]}
+      >
+        <meshStandardMaterial color="#ffffff" roughness={0.5} side={THREE.DoubleSide} />
       </mesh>
     </group>
   )
