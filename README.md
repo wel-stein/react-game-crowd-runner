@@ -33,6 +33,16 @@ rival's AI grabs a gate too (sized against *its* crowd), so both counts grow
 live — a running **lead indicator** shows who's ahead. At the end the two armies
 collide and the bigger one wins. Difficulty sets the rival's smarts (50% → 92%).
 
+### 🚗 Car Jam
+
+A change of pace — a **tap puzzle**, not a runner. A parking lot is packed with
+cars, each with an arrow on its roof. **Tap a car to drive it straight off the
+lot** in its arrow's direction — but it only leaves if the lane ahead is clear,
+so you have to **free the blockers first**. Clear every car before your **tap
+budget** runs out; wasting taps on blocked cars costs you stars. Levels are
+**procedurally generated and always solvable** (reverse-construction), with 5×5,
+6×6 and 7×7 lots across the three difficulties.
+
 ## Quick start
 
 ```bash
@@ -82,6 +92,10 @@ src/
       WallRushGame.tsx     # corridor +1/+99 wall-collection mechanic
       config.ts state/ hooks/ utils/ components/
       wall-rush.css
+    car-jam/               # ── fully isolated game ──────────────
+      CarJamGame.tsx       # tap-to-unblock parking-lot puzzle
+      config.ts state/ utils/ components/   # utils/generate.ts builds solvable lots
+      car-jam.css
 ```
 
 ### Isolation & adding a game

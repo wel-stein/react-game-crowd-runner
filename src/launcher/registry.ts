@@ -31,4 +31,11 @@ export const GAMES: GameMeta[] = [
     emoji: '⚔️',
     accent: '#ff7a3a',
   },
+  {
+    id: 'car-jam',
+    title: 'Car Jam',
+    tagline: 'Tap cars to clear the lot — free the blockers first',
+    emoji: '🚗',
+    accent: '#41c98a',
+  },
 ]

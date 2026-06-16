@@ -1,0 +1,320 @@
+/* Car Jam styles — fully self-contained, all classes cj- prefixed. */
+:root {
+  --cj-ink: #1d2a3a;
+}
+
+.cj-app {
+  position: fixed;
+  inset: 0;
+  font-family: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.cj-app canvas {
+  display: block;
+  touch-action: none;
+}
+
+.cj-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* top stat chips */
+.cj-stat {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.32);
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 14px;
+  padding: 8px 14px;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.28);
+}
+.cj-cars {
+  left: 50%;
+  transform: translateX(-80px);
+}
+.cj-taps {
+  left: 50%;
+  transform: translateX(8px);
+}
+.cj-stat-ico {
+  font-size: 18px;
+}
+.cj-stat-val {
+  font-weight: 900;
+  font-size: 26px;
+}
+.cj-stat-lbl {
+  font-weight: 700;
+  font-size: 12px;
+  opacity: 0.85;
+}
+.cj-taps.low {
+  background: rgba(214, 49, 63, 0.85);
+  border-color: #fff;
+  animation: cj-flash 0.8s ease infinite;
+}
+@keyframes cj-flash {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* difficulty badge */
+.cj-badge {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 99px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+}
+.cj-badge.cj-easy {
+  background: #2bb061;
+}
+.cj-badge.cj-medium {
+  background: #f5901e;
+}
+.cj-badge.cj-hard {
+  background: #e23b4a;
+}
+
+.cj-pause {
+  pointer-events: auto;
+  cursor: pointer;
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  width: 44px;
+  height: 44px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+/* overlays */
+.cj-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5));
+  pointer-events: auto;
+  padding: 20px;
+}
+.cj-panel {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 26px;
+  padding: 32px 28px 28px;
+  text-align: center;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  border: 4px solid #fff;
+}
+.cj-title {
+  font-size: clamp(28px, 7vw, 44px);
+  font-weight: 900;
+  color: var(--cj-ink);
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.cj-title.win {
+  color: #1ca64c;
+}
+.cj-title.lose {
+  color: #d6313f;
+}
+.cj-sub {
+  color: #46566a;
+  font-size: clamp(14px, 4vw, 17px);
+  line-height: 1.5;
+  margin-bottom: 22px;
+  font-weight: 600;
+}
+.cj-choose {
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #7b8aa0;
+  margin-bottom: 12px;
+}
+.cj-diff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cj-diff {
+  pointer-events: auto;
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  border-radius: 16px;
+  padding: 14px 18px;
+  color: #fff;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 'name best' 'tag best';
+  column-gap: 10px;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.22), 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+.cj-diff:active {
+  transform: translateY(3px);
+}
+.cj-diff-name {
+  grid-area: name;
+  font-weight: 900;
+  font-size: 22px;
+}
+.cj-diff-tag {
+  grid-area: tag;
+  font-weight: 600;
+  font-size: 13px;
+  opacity: 0.92;
+}
+.cj-diff-best {
+  grid-area: best;
+  align-self: center;
+  font-weight: 900;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.18);
+  padding: 4px 10px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.cj-diff.cj-easy {
+  background: linear-gradient(180deg, #45d27a, #2bb061);
+}
+.cj-diff.cj-medium {
+  background: linear-gradient(180deg, #ffb13b, #f5901e);
+}
+.cj-diff.cj-hard {
+  background: linear-gradient(180deg, #ff6a6a, #e23b4a);
+}
+
+.cj-stars {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.cj-star {
+  font-size: 44px;
+  color: #d7dde6;
+}
+.cj-star.on {
+  color: #ffce3a;
+  animation: cj-star 0.4s ease backwards;
+}
+.cj-star.on:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.cj-star.on:nth-child(3) {
+  animation-delay: 0.24s;
+}
+@keyframes cj-star {
+  0% {
+    transform: scale(0) rotate(-40deg);
+  }
+  70% {
+    transform: scale(1.3) rotate(8deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+.cj-score {
+  background: #f1f4f8;
+  border-radius: 16px;
+  padding: 12px 18px;
+  margin-bottom: 22px;
+}
+.cj-score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 800;
+  color: #7b8aa0;
+  font-size: 15px;
+  letter-spacing: 1px;
+  padding: 3px 0;
+}
+.cj-score-v {
+  font-size: 26px;
+  color: var(--cj-ink);
+}
+.cj-score-row.best .cj-score-v {
+  color: #f5901e;
+}
+.cj-newhigh {
+  margin-top: 8px;
+  font-weight: 900;
+  color: #1ca64c;
+  letter-spacing: 1px;
+}
+
+.cj-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+.cj-btn {
+  pointer-events: auto;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: clamp(16px, 5vw, 20px);
+  color: #fff;
+  background: linear-gradient(180deg, #ffb13b, #ff8a1e);
+  padding: 14px 26px;
+  border-radius: 99px;
+  letter-spacing: 1px;
+  box-shadow: 0 6px 0 #d96f12, 0 10px 18px rgba(0, 0, 0, 0.25);
+}
+.cj-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #d96f12;
+}
+.cj-btn-2 {
+  background: linear-gradient(180deg, #8a98ad, #6c7a90);
+  box-shadow: 0 6px 0 #4d5970, 0 10px 18px rgba(0, 0, 0, 0.25);
+}
+.cj-btn-2:active {
+  box-shadow: 0 2px 0 #4d5970;
+}
+
+.cj-back {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  z-index: 20;
+  pointer-events: auto;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.32);
+  color: #fff;
+  font-weight: 900;
+  font-size: 15px;
+  padding: 8px 14px;
+}
