@@ -17,6 +17,9 @@ const GAME_COMPONENTS: Record<string, ComponentType<GameProps>> = {
   'crowd-clash': lazy(() =>
     import('./games/crowd-clash/CrowdClashGame').then((m) => ({ default: m.CrowdClashGame })),
   ),
+  'car-jam': lazy(() =>
+    import('./games/car-jam/CarJamGame').then((m) => ({ default: m.CarJamGame })),
+  ),
 }
 
 export default function App() {
