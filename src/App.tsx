@@ -20,6 +20,11 @@ const GAME_COMPONENTS: Record<string, ComponentType<GameProps>> = {
   'car-jam': lazy(() =>
     import('./games/car-jam/CarJamGame').then((m) => ({ default: m.CarJamGame })),
   ),
+  'chess-endgames': lazy(() =>
+    import('./games/chess-endgames/ChessEndgamesGame').then((m) => ({
+      default: m.ChessEndgamesGame,
+    })),
+  ),
 }
 
 export default function App() {
