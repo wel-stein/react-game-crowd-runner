@@ -1,6 +1,33 @@
+import { useEffect, useRef } from 'react'
 import { PUZZLES } from '../config'
 import { useChessStore } from '../state/store'
 import { Board } from './Board'
+
+// Group ply-ordered SAN into numbered full moves: "1. Bf3+ Kg1".
+function MoveList({ history }: { history: string[] }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (el) el.scrollLeft = el.scrollWidth
+  }, [history])
+
+  const moves = []
+  for (let i = 0; i < history.length; i += 2) {
+    moves.push(
+      <span key={i} className="ce-move">
+        <span className="ce-move-no">{i / 2 + 1}.</span>
+        <span className="ce-san">{history[i]}</span>
+        {history[i + 1] && <span className="ce-san black">{history[i + 1]}</span>}
+      </span>,
+    )
+  }
+
+  return (
+    <div className="ce-movelist" ref={ref}>
+      {history.length === 0 ? <span className="ce-move-empty">Moves appear here…</span> : moves}
+    </div>
+  )
+}
 
 // The play view: board, status bar, controls and the solved overlay.
 export function Play() {
@@ -14,6 +41,7 @@ export function Play() {
   const toMenu = useChessStore((s) => s.toMenu)
   const nextPuzzle = useChessStore((s) => s.nextPuzzle)
 
+  const sanHistory = useChessStore((s) => s.sanHistory)
   const p = PUZZLES[puzzleIndex]
   const isLast = puzzleIndex >= PUZZLES.length - 1
 
@@ -44,6 +72,8 @@ export function Play() {
         <Board />
         {message && <div className="ce-toast">{message}</div>}
       </div>
+
+      <MoveList history={sanHistory} />
 
       <div className="ce-controls">
         <button className="ce-btn ce-btn-ghost" onClick={useHint} disabled={status !== 'player'}>
