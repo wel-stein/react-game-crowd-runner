@@ -33,34 +33,7 @@ export const PUZZLES: Puzzle[] = [
     hintSquares: ['h5', 'f3'],
     idea: 'Bf3+! was the key — it checks the king AND covers h1 to kill the …h1=Q threat, and the bishop is taboo because your king guards f3. From there you won the h-pawn a piece up and converted the win into checkmate. Clean technique!',
   },
-  {
-    id: 2,
-    title: "Queen's Embrace",
-    fen: '7k/8/5K2/8/8/8/8/6Q1 w - - 0 1',
-    goal: 'mate',
-    par: 1,
-    hintSquares: ['g1', 'g7'],
-    idea: 'Qg7#. The king on f6 covers the queen and the escape squares, so Qg7 is a clean corner mate.',
-  },
-  {
-    id: 3,
-    title: 'Back-Rank Finish',
-    fen: '6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1',
-    goal: 'mate',
-    par: 1,
-    hintSquares: ['a1', 'a8'],
-    idea: 'Ra8#. The pawns on f7-g7-h7 wall in their own king — the classic back-rank mate.',
-  },
-  {
-    id: 4,
-    title: 'Two-Rook Ladder',
-    fen: '7k/8/8/8/8/8/R7/1R5K w - - 0 1',
-    goal: 'mate',
-    par: 2,
-    hintSquares: ['b1', 'g1'],
-    idea: 'The rook ladder: Rg1 boxes the king on the h-file, then the other rook delivers Ra8# — whatever Black tries.',
-  },
 ]
 
-// Difficulty of Black's defence in 'mate' puzzles (search depth).
+// Strength of Black's defence (search depth) while you play the puzzle out.
 export const ENGINE_DEPTH = 3
