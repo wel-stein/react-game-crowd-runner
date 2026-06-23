@@ -303,6 +303,55 @@
   }
 }
 
+/* ----- move list (algebraic notation) ----- */
+.ce-movelist {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-variant-numeric: tabular-nums;
+  scrollbar-width: thin;
+}
+.ce-movelist::-webkit-scrollbar {
+  height: 6px;
+}
+.ce-movelist::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 99px;
+}
+.ce-move {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  flex: 0 0 auto;
+}
+.ce-move-no {
+  color: #7c8ea3;
+  font-weight: 700;
+  font-size: 14px;
+}
+.ce-san {
+  color: #eaf0f7;
+  font-weight: 800;
+  font-size: 15px;
+}
+.ce-san.black {
+  color: #9fd0ff;
+}
+.ce-move-empty {
+  color: #7c8ea3;
+  font-weight: 600;
+  font-size: 14px;
+  font-style: italic;
+}
+
 /* ----- controls ----- */
 .ce-controls {
   width: 100%;

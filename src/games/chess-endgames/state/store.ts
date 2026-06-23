@@ -9,6 +9,7 @@ import {
   makeMove,
   moveUci,
   parseFEN,
+  toSAN,
   isWhitePiece,
   type Board,
   type Move,
@@ -45,6 +46,7 @@ interface State {
   lastMove: [number, number] | null
   status: Status
   message: string | null // transient feedback
+  sanHistory: string[] // played moves in algebraic notation, ply order
   movesUsed: number
   hintUsed: boolean
   retried: boolean
@@ -80,6 +82,7 @@ export const useChessStore = create<State>((set, get) => {
       lastMove: null,
       status: 'player',
       message: msg,
+      sanHistory: [],
       movesUsed: 0,
       retried: true,
     })
@@ -114,8 +117,14 @@ export const useChessStore = create<State>((set, get) => {
         set({ status: 'player' })
         return
       }
+      const san = toSAN(board, reply, false)
       const nb = makeMove(board, reply)
-      set({ board: nb, lastMove: [reply.from, reply.to], status: 'player' })
+      set((s) => ({
+        board: nb,
+        lastMove: [reply.from, reply.to],
+        status: 'player',
+        sanHistory: [...s.sanHistory, san],
+      }))
       if (isCheckmate(nb, true)) fail('Black mated you — try again!')
       else if (isStalemate(nb, true)) fail('Stalemate — only a draw. Try again.')
     }, 480)
@@ -124,9 +133,17 @@ export const useChessStore = create<State>((set, get) => {
   const applyPlayerMove = (m: Move) => {
     const p = puzzle()
     const board = get().board
+    const san = toSAN(board, m, true)
     const nb = makeMove(board, m)
     const movesUsed = get().movesUsed + 1
-    set({ board: nb, lastMove: [m.from, m.to], selected: null, targets: [], movesUsed })
+    set((s) => ({
+      board: nb,
+      lastMove: [m.from, m.to],
+      selected: null,
+      targets: [],
+      movesUsed,
+      sanHistory: [...s.sanHistory, san],
+    }))
 
     if (p.goal === 'keymove') {
       if (p.solution?.includes(moveUci(m))) solve()
@@ -165,6 +182,7 @@ export const useChessStore = create<State>((set, get) => {
     lastMove: null,
     status: 'player',
     message: null,
+    sanHistory: [],
     movesUsed: 0,
     hintUsed: false,
     retried: false,
@@ -182,6 +200,7 @@ export const useChessStore = create<State>((set, get) => {
         lastMove: null,
         status: 'player',
         message: null,
+        sanHistory: [],
         movesUsed: 0,
         hintUsed: false,
         retried: false,
@@ -231,6 +250,7 @@ export const useChessStore = create<State>((set, get) => {
         lastMove: null,
         status: 'player',
         message: null,
+        sanHistory: [],
         movesUsed: 0,
         hintSquares: null,
       })

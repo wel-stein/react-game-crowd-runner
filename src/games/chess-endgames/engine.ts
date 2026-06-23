@@ -51,6 +51,38 @@ export const fileOf = (i: number) => i % 8
 export const rankOf = (i: number) => Math.floor(i / 8)
 export const moveUci = (m: Move) => sqName(m.from) + sqName(m.to) + (m.promo ? m.promo.toLowerCase() : '')
 
+// Standard Algebraic Notation for a move, given the board *before* it is played.
+// `white` is the side to move. Handles captures, disambiguation, promotion and
+// the +/# check/checkmate suffix. (No castling / en-passant in these puzzles.)
+export function toSAN(board: Board, m: Move, white: boolean): string {
+  const piece = board[m.from]
+  const up = piece.toUpperCase()
+  const capture = board[m.to] !== '.'
+  let san: string
+  if (up === 'P') {
+    san = (capture ? FILES[fileOf(m.from)] + 'x' : '') + sqName(m.to)
+    if (m.promo) san += '=' + m.promo.toUpperCase()
+  } else {
+    san = up
+    // disambiguate against other identical pieces that can also reach m.to
+    const rivals = legalMoves(board, white).filter(
+      (o) => o.to === m.to && o.from !== m.from && board[o.from] === piece,
+    )
+    if (rivals.length > 0) {
+      const sameFile = rivals.some((o) => fileOf(o.from) === fileOf(m.from))
+      const sameRank = rivals.some((o) => rankOf(o.from) === rankOf(m.from))
+      if (!sameFile) san += FILES[fileOf(m.from)]
+      else if (!sameRank) san += String(rankOf(m.from) + 1)
+      else san += FILES[fileOf(m.from)] + String(rankOf(m.from) + 1)
+    }
+    if (capture) san += 'x'
+    san += sqName(m.to)
+  }
+  const after = makeMove(board, m)
+  if (inCheck(after, !white)) san += isCheckmate(after, !white) ? '#' : '+'
+  return san
+}
+
 // Is square (f, r) attacked by the given side?
 export function attacked(board: Board, f: number, r: number, byWhite: boolean): boolean {
   const pawnRank = byWhite ? -1 : 1 // attacking pawn sits one rank toward its side
