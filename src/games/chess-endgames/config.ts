@@ -7,7 +7,9 @@
 // All positions are engine-verified (see the analysis in the PR).
 // ---------------------------------------------------------------------------
 
-export type Goal = 'keymove' | 'mate'
+// 'keymove' = find the one winning move; 'mate' = mate within `par` moves;
+// 'convert' = find the key move, then play on against the engine until you mate.
+export type Goal = 'keymove' | 'mate' | 'convert'
 
 export interface Puzzle {
   id: number
@@ -25,11 +27,11 @@ export const PUZZLES: Puzzle[] = [
     id: 1,
     title: 'The Taboo Bishop',
     fen: '8/8/3p4/4p2B/4P3/8/4K1kp/8 w - - 0 1',
-    goal: 'keymove',
+    goal: 'convert',
     par: 1,
     solution: ['h5f3'],
     hintSquares: ['h5', 'f3'],
-    idea: 'Bf3+! The only move: it checks the king AND covers h1, killing the …h1=Q threat. The bishop is taboo — your king on e2 guards f3 — so Black must step aside and you win the h-pawn a piece up.',
+    idea: 'Bf3+! was the key — it checks the king AND covers h1 to kill the …h1=Q threat, and the bishop is taboo because your king guards f3. From there you won the h-pawn a piece up and converted the win into checkmate. Clean technique!',
   },
   {
     id: 2,

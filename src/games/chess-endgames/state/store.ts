@@ -94,7 +94,8 @@ export const useChessStore = create<State>((set, get) => {
     let s = 3
     if (hintUsed) s = Math.min(s, 2)
     if (retried) s = Math.min(s, 2)
-    if (movesUsed > p.par) s = Math.min(s, 2)
+    // a full conversion takes many moves, so don't penalise move count there
+    if (p.goal !== 'convert' && movesUsed > p.par) s = Math.min(s, 2)
     if (hintUsed && retried) s = 1
     s = Math.max(1, s)
     const best = Math.max(stars[p.id] ?? 0, s)
@@ -116,6 +117,7 @@ export const useChessStore = create<State>((set, get) => {
       const nb = makeMove(board, reply)
       set({ board: nb, lastMove: [reply.from, reply.to], status: 'player' })
       if (isCheckmate(nb, true)) fail('Black mated you — try again!')
+      else if (isStalemate(nb, true)) fail('Stalemate — only a draw. Try again.')
     }, 480)
   }
 
@@ -132,7 +134,13 @@ export const useChessStore = create<State>((set, get) => {
       return
     }
 
-    // goal === 'mate'
+    // 'convert': the first move must be the key move, then play on to mate
+    if (p.goal === 'convert' && movesUsed === 1 && p.solution && !p.solution.includes(moveUci(m))) {
+      fail('Not the key move — look again.')
+      return
+    }
+
+    // shared resolution for 'mate' and 'convert'
     if (isCheckmate(nb, false)) {
       solve()
       return
@@ -141,7 +149,7 @@ export const useChessStore = create<State>((set, get) => {
       fail('Stalemate! That only draws — try again.')
       return
     }
-    if (movesUsed >= p.par) {
+    if (p.goal === 'mate' && movesUsed >= p.par) {
       fail('Not the mate — try again.')
       return
     }

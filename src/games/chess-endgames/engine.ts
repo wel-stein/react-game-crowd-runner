@@ -210,12 +210,23 @@ const MATE = 100000
 
 function evaluate(board: Board, white: boolean): number {
   let s = 0
-  for (const p of board) {
+  for (let i = 0; i < 64; i++) {
+    const p = board[i]
     if (p === '.') continue
-    const v = VAL[p.toUpperCase()]
-    s += isWhitePiece(p) ? v : -v
+    const up = p.toUpperCase()
+    let val = VAL[up] * 100
+    const r = rankOf(i)
+    const f = fileOf(i)
+    if (up === 'P') {
+      // reward pawns that are closer to promotion (real endgame counterplay)
+      val += (isWhitePiece(p) ? r : 7 - r) * 8
+    } else if (up === 'K') {
+      // king centralisation matters in the endgame
+      val += (3.5 - Math.abs(3.5 - f) + (3.5 - Math.abs(3.5 - r))) * 4
+    }
+    s += isWhitePiece(p) ? val : -val
   }
-  return (white ? s : -s) * 100
+  return white ? s : -s
 }
 
 function negamax(board: Board, white: boolean, depth: number, alpha: number, beta: number): number {
