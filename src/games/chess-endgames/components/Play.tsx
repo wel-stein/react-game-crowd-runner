@@ -32,12 +32,12 @@ export function Play() {
               ? 'Black is thinking…'
               : p.goal === 'mate'
                 ? `White to move · Mate in ${p.par}`
-                : 'White to move · Find the win'}
+                : p.goal === 'convert'
+                  ? 'White to move · Win, then checkmate'
+                  : 'White to move · Find the win'}
           </span>
         </div>
-        <div className="ce-moves">
-          {movesUsed}/{p.par}
-        </div>
+        <div className="ce-moves">{p.goal === 'convert' ? movesUsed : `${movesUsed}/${p.par}`}</div>
       </div>
 
       <div className="ce-board-wrap">

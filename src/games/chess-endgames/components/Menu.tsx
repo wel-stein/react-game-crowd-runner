@@ -24,7 +24,11 @@ export function Menu() {
                 <span className="ce-puzzle-body">
                   <span className="ce-puzzle-name">{p.title}</span>
                   <span className="ce-puzzle-goal">
-                    {p.goal === 'mate' ? `Mate in ${p.par}` : 'Find the winning move'}
+                    {p.goal === 'mate'
+                      ? `Mate in ${p.par}`
+                      : p.goal === 'convert'
+                        ? 'Find the win, then mate'
+                        : 'Find the winning move'}
                   </span>
                 </span>
                 <span className="ce-puzzle-stars">
