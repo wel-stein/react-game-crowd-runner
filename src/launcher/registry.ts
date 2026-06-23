@@ -38,4 +38,11 @@ export const GAMES: GameMeta[] = [
     emoji: '🚗',
     accent: '#41c98a',
   },
+  {
+    id: 'chess-endgames',
+    title: 'Chess Endgames',
+    tagline: 'Solve bite-size endgames — White to play and win',
+    emoji: '♟️',
+    accent: '#6f9b53',
+  },
 ]

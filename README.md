@@ -43,6 +43,15 @@ budget** runs out; wasting taps on blocked cars costs you stars. Levels are
 **procedurally generated and always solvable** (reverse-construction), with 5×5,
 6×6 and 7×7 lots across the three difficulties.
 
+### ♟️ Chess Endgames
+
+A campaign of bite-size **chess puzzles** — a pure 2D board game (no 3D scene).
+You always play **White and move first**. Each puzzle is either *find the one
+winning idea* (e.g. the "taboo bishop" `Bf3+` that checks and stops `…h1=Q`) or
+*deliver mate in N* against a built-in defending engine. Every position is
+**engine-verified**; earn 1–3 stars per puzzle (fewer for using a hint or
+retrying), saved locally.
+
 ## Quick start
 
 ```bash
@@ -96,6 +105,10 @@ src/
       CarJamGame.tsx       # tap-to-unblock parking-lot puzzle
       config.ts state/ utils/ components/   # utils/generate.ts builds solvable lots
       car-jam.css
+    chess-endgames/        # ── fully isolated game ──────────────
+      ChessEndgamesGame.tsx # 2D chess endgame puzzle campaign
+      engine.ts config.ts state/ components/   # engine.ts = self-contained chess rules + AI
+      chess-endgames.css
 ```
 
 ### Isolation & adding a game
